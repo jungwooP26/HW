@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Login</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="center">
+            <h1>Login</h1><hr><br>
+            <form method="post" id="loginform">
+                <table>
+                <tr>
+                    <td>User ID</td>
+                    <td><input type="text" name="uid"></td>
+                </tr>
+                <tr>
+                    <td>Password</td>
+                    <td><input type="password" name="upw"></td>
+                </tr>
+            </table><br><br><br>
+            <input type="submit" value="Login" style="width: 20%; height: 40px;"><br><br>
+            </form>
+            <a href="sign_up.html">
+                <button type="button" style="width: 20%; height: 40px;">sign up</button>
+            </a>
+            <script>
+                const FormElement = document.getElementById("loginform");
+                FormElement.addEventListener("submit", function(event) {
+                    event.preventDefault();
+                    const myForm = new FormData(FormElement);
+                    const Req = new XMLHttpRequest();
+                    Req.onreadystatechange = function() {
+                        if (Req.readyState == 4 && Req.status == 200) {
+                            const res = Req.responseText;
+                            if (res == "success") {
+                                window.location.href = "Bulletin_Board_list_view.php";
+                            } else if (res == "wrong_pw") {
+                                alert("Wrong Password.");
+                            } else if (res == "no_inf") {
+                                alert("User not found. Please register.");
+                            } else if (res == "no_input") {
+                                alert("Please enter both ID and Password.");
+                            } else {
+                                alert("Unknown error: " + res);
+                            }
+                        }
+                    };
+                    Req.open("POST", "login.php", true);
+                    Req.send(myForm);
+                });
+            </script>
+        </div>
+    </body>
+</html>

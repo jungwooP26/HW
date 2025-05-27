@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>register</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="center">
+            <h1>Sign Up</h1><hr><br>
+            <form id="register" method="post">
+                <table>
+                    <tr>
+                        <td>User ID</td>
+                        <td><input type="text" name="uid" id="uid"></td>
+                        <td><input type="button" value="Check Availability" id="checkBtn"></td>
+                    </tr>
+                    <tr>
+                        <td>Password</td>
+                        <td><input type="password" name="upw" id="upw"></td>
+                    </tr>
+                    <tr>
+                        <td>Confirm Password</td>
+                        <td><input type="password" name="cpw" id="cpw"></td>
+                    </tr>
+                    <tr>
+                        <td>Name</td>
+                        <td><input type="text" name="uname" id="uname"></td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td><input type="text" name="uemail" id="uemail"></td>
+                    </tr>
+                </table><br><br><br>
+                <input type="submit" value="Save" id="saveBtn" style="width: 20%; height: 40px;"><br><br>
+            </form>
+            <a href="index.html">
+                <button type="button" style="width: 20%; height: 40px;">Cancel</button>
+            </a>
+            <script>
+                var idcheck = false;
+                var checkedUid = "";
+
+                document.getElementById("checkBtn").addEventListener("click", function () {
+                    const uid = document.getElementById("uid").value.trim();
+                    if (uid == "") {
+                      alert("Please enter ID.");
+                      return;
+                    }
+
+                    const form = document.getElementById("register");
+                    const formData = new FormData(form);
+
+                    const Req = new XMLHttpRequest();
+                    Req.onreadystatechange = function () {
+                      if (Req.readyState == 4 && Req.status == 200) {
+                        const res = Req.responseText.trim();
+                        if (res == "good") {
+                            alert("Available ID.");
+                            idcheck = true;
+                            checkedUid = uid;
+                            document.getElementById("uid").readOnly = true;
+                        } else if (res == "bad") {
+                            alert("Duplicate ID.");
+                        } else if (res == "no_input") {
+                            alert("Please enter ID.");
+                        } else {
+                            alert("Unknown error: " + res);
+                        }
+                    }
+                    };
+                    Req.open("POST", "IDcheck.php", true);
+                    Req.send(formData);
+                });
+
+                document.getElementById("register").addEventListener("submit", function(event) {
+                    const uid = document.getElementById("uid").value;
+                    const upw = document.getElementById("upw").value;
+                    const cpw = document.getElementById("cpw").value;
+                    const uname = document.getElementById("uname").value;
+                    const uemail = document.getElementById("uemail").value;
+
+                    if (upw == "" || cpw == "" || uname == "" || uemail == "")
+                    {
+                        alert("Please fill out all required fields.");
+                        event.preventDefault();
+                    } else if (upw != cpw)
+                    {
+                        alert("Passwords do not match.");
+                        event.preventDefault();
+                    } else if (idcheck == false || uid !== checkedUid)
+                    {
+                        alert("Please check ID availability again.");
+                        event.preventDefault();
+                    } else
+                    {
+                        event.preventDefault();
+
+                        const formData = new FormData(this);
+                        const Req = new XMLHttpRequest();
+                        Req.onreadystatechange = function () {
+                            if (Req.readyState == 4 && Req.status == 200) {
+                                const res = Req.responseText;
+                                if (res == "success") {
+                                    alert("Account has been created.");
+                                    window.location.href = "index.html";
+                                } else {
+                                    alert("Registration failed: " + res);
+                                }
+                            }
+                        };
+                        Req.open("POST", "register_db.php", true);
+                        Req.send(formData);
+                    }
+                });
+            </script>
+        </div>
+    </body>
+</html>
